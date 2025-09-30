@@ -213,8 +213,11 @@
 
         // Встановлення шляху до PDF Viewer (ПОТРІБЕН КОНТЕКСТ)
         // Припускаємо, що pdfjs_viewer знаходиться поруч:
-        const pdfViewerPath = `/static/js/pdfjs_viewer/web/viewer.html?file=/literature/?file=${encodeURIComponent(fileName)}`;
-        document.getElementById('pdf-iframe').src = pdfViewerPath;
+        const pdfViewerPath = 
+        `/static/js/pdfjs_viewer/web/viewer.html?file=/literature/${encodeURIComponent(fileName)}`;
+    
+        // Встановлюємо src для iframe
+        document.getElementById('pdf-iframe').src = pdfViewerPath;  
 
         // Завантаження нотаток при старті
         loadNotes(currentPage);
