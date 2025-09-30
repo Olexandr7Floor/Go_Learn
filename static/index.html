@@ -13,19 +13,19 @@
             line-height: 1.6;
             min-height: 100vh;
             
-            /* === ВИПРАВЛЕНО: КОРИСТУЄМОСЯ ПРАВИЛЬНИМИ ІМЕНАМИ === */
+            /* === СТИЛІ ФОНОВИХ ЗОБРАЖЕНЬ (Гофери) === */
             background-image: 
-                url('images/go_gropher_left.png'), 
+                url('images/go_gopher_left.png'), 
                 url('images/go_gopher_right.png');
                 
             background-repeat: no-repeat;
-            background-attachment: fixed; /* Закріплює зображення при прокручуванні */
+            background-attachment: fixed; 
             
             background-position: 
-                left 50px bottom 50px, /* Зліва, знизу 50px */
-                right 50px bottom 550px; /* Справа, знизу 50px */
+                left 50px bottom 50px, 
+                right 50px bottom 50px;
                 
-            background-size: 350px; 
+            background-size: 180px; /* Збільшений розмір */
             /* === КІНЕЦЬ ЗОБРАЖЕНЬ === */
         }
         .container {
@@ -38,11 +38,14 @@
             padding-top: 40px; 
             padding-bottom: 40px;
         }
+        
+        /* ЧИСТИЙ ЗАГОЛОВОК */
         h1 {
             color: #61afef;
             border-bottom: 2px solid #56b6c2;
             padding-bottom: 10px;
         }
+        
         ul {
             list-style: none;
             padding: 0;
@@ -63,9 +66,13 @@
             font-weight: bold;
             display: block;
         }
+        /* Спеціальний стиль для курсу (перший елемент) */
+        li:first-child a {
+            color: #e5c07b; /* Золотий колір для виділення курсу */
+        }
         a:hover {
             text-decoration: underline;
-            color: #e5c07b;
+            color: #cfad6b;
         }
         .file-name {
             font-size: 0.8em;
@@ -73,74 +80,30 @@
             display: block;
             margin-top: 5px;
         }
-        .header-group {
-            display: flex; /* Дозволяє розмістити елементи в ряд */
-            justify-content: space-between; /* Розносить елементи по краях */
-            align-items: center; /* Вирівнює по вертикалі */
-            border-bottom: 2px solid #56b6c2;
-            padding-bottom: 10px;
-        }
-
-        h1 {
-            color: #61afef;
-            /* ВИДАЛИТИ: border-bottom: 2px solid #56b6c2; */ 
-            /* ВИДАЛИТИ: padding-bottom: 10px; */
-            margin: 0; /* Прибираємо зовнішні відступи */
-        }
-
-        /* СТИЛЬ ДЛЯ КНОПКИ КУРСУ */
-        .course-button {
-            background-color: #e5c07b; /* Золотистий колір для привернення уваги */
-            color: #282c34;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.2s;
-            white-space: nowrap; /* Забороняє перенесення тексту */
-        }
-
-        .course-button:hover {
-            background-color: #cfad6b;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-    
-        <div class="header-group">
-            <h1>Go (Golang) Література</h1>
-            
-            <a 
-                href="https://go.dev/tour/welcome/1" 
-                target="_blank" 
-                class="course-button"
-                title="Відкрити загальний курс Go на Notion"
-            >
-                Загальний курс
-            </a>
-            <a 
-            href="https://pantela.notion.site/Go-EvgenyPantela-2622eb3830de43639fbb7a0e2b7c2757" 
-            target="_blank" 
-            class="course-button"
-            title="Відкрити локальний курс Go"
-        >
-            Фундаментальний курс
-        </a>
-        </div>
+        
+        <h1>Go (Golang) Література</h1>
         
         <p>Оберіть книгу для читання:</p>
         <ul id="literature-list">
-            </ul>
+            <p>Завантаження списку...</p>
+        </ul>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            fetch('/api/literature')
+            // КОНСТАНТА: Назва файлу-плейсхолдера для курсу
+            const COURSE_FILE_NAME = '1_Фундаментальний_курс_Go.pdf';
+            const COURSE_DISPLAY_NAME = 'Фундаментальний курс Go: Детальний синтаксис та основи';
+
+            // ЗМІНЕНО: Завантажуємо статичний JSON-файл
+            fetch('/static/literature.json') 
                 .then(response => {
                     if (!response.ok) {
+                        // Якщо файл не знайдено (404), це помилка
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     return response.json();
@@ -150,21 +113,27 @@
                     list.innerHTML = ''; 
 
                     if (books.length === 0) {
-                        list.innerHTML = '<p>Папка з літературою порожня або не знайдена.</p>';
+                        list.innerHTML = '<p>Список літератури порожній.</p>';
                         return;
                     }
 
                     books.forEach(book => {
                         const li = document.createElement('li');
                         
-                        // Вставлено перевірку book.fileName для запобігання помилки
+                        // Логіка для виведення імені
+                        let displayName = book.displayName;
+                        
+                        if (book.fileName === COURSE_FILE_NAME) {
+                            displayName = COURSE_DISPLAY_NAME;
+                        }
+                        
                         const fileNameDisplay = book.fileName 
                             ? `<span class="file-name">(${book.fileName})</span>` 
                             : '<span class="file-name" style="color:#e06c75;">(Немає імені файлу)</span>';
 
                         li.innerHTML = `
-                            <a href="reader.html?file=${encodeURIComponent(book.fileName)}" title="Читати ${book.displayName}">
-                                ${book.displayName}
+                            <a href="reader.html?file=${encodeURIComponent(book.fileName)}" title="Читати ${displayName}">
+                                ${displayName}
                                 ${fileNameDisplay}
                             </a>
                         `;
@@ -175,7 +144,7 @@
                     console.error('Помилка завантаження літератури:', error);
                     document.getElementById('literature-list').innerHTML = `
                         <p style="color: #e06c75;">
-                            Помилка завантаження списку літератури: ${error.message}. Перевірте Go-сервер.
+                            Помилка завантаження списку літератури: ${error.message}. Перевірте, чи існує файл /static/literature.json.
                         </p>
                     `;
                 });
