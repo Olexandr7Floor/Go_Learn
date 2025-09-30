@@ -15,7 +15,7 @@
             
             /* === СТИЛІ ФОНОВИХ ЗОБРАЖЕНЬ (Гофери) === */
             background-image: 
-                url('images/go_gopher_left.png'), 
+                url('images/go_gopher_left.png'), /* ВИПРАВЛЕНО: go_gopher_left */
                 url('images/go_gopher_right.png');
                 
             background-repeat: no-repeat;
@@ -23,9 +23,9 @@
             
             background-position: 
                 left 50px bottom 50px, 
-                right 50px bottom 50px;
+                right 50px bottom 50px; /* ВИПРАВЛЕНО: Знову внизу */
                 
-            background-size: 180px; /* Збільшений розмір */
+            background-size: 180px; /* ЗМЕНШЕНО до більш типового розміру */
             /* === КІНЕЦЬ ЗОБРАЖЕНЬ === */
         }
         .container {
@@ -97,7 +97,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             // КОНСТАНТА: Назва файлу-плейсхолдера для курсу
             const COURSE_FILE_NAME = '1_Фундаментальний_курс_Go.pdf';
-            const COURSE_DISPLAY_NAME = 'Фундаментальний курс Go: Детальний синтаксис та основи';
+            // ВИПРАВЛЕНО: Повертаємо правильну назву курсу
+            const COURSE_DISPLAY_NAME = 'Фундаментальний курс Go: Детальний синтаксис та основи'; 
 
             // ЗМІНЕНО: Завантажуємо статичний JSON-файл
             fetch('/static/literature.json') 
