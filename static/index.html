@@ -14,8 +14,9 @@
             min-height: 100vh;
             
             /* === СТИЛІ ФОНОВИХ ЗОБРАЖЕНЬ (Гофери) === */
+            /* Виправлено: 'gopher' та позиціонування */
             background-image: 
-                url('images/go_gopher_left.png'), /* ВИПРАВЛЕНО: go_gopher_left */
+                url('images/go_gopher_left.png'), 
                 url('images/go_gopher_right.png');
                 
             background-repeat: no-repeat;
@@ -23,9 +24,9 @@
             
             background-position: 
                 left 50px bottom 50px, 
-                right 50px bottom 50px; /* ВИПРАВЛЕНО: Знову внизу */
+                right 50px bottom 500px; 
                 
-            background-size: 180px; /* ЗМЕНШЕНО до більш типового розміру */
+            background-size: 400px; 
             /* === КІНЕЦЬ ЗОБРАЖЕНЬ === */
         }
         .container {
@@ -68,7 +69,7 @@
         }
         /* Спеціальний стиль для курсу (перший елемент) */
         li:first-child a {
-            color: #e5c07b; /* Золотий колір для виділення курсу */
+            color: #e5c07b;
         }
         a:hover {
             text-decoration: underline;
@@ -94,61 +95,74 @@
     </div>
 
     <script>
+        // === ВБУДОВАНІ JSON-ДАНІ (ВИРІШЕННЯ ПРОБЛЕМИ КОДУВАННЯ) ===
+        const BOOKS_DATA = [
+            {
+                "displayName": "Фундаментальний курс Go: Детальний синтаксис та основи",
+                "fileName": "1_Фундаментальний_курс_Go.pdf"
+            },
+            {
+                "displayName": "GO idiomy i patterny proektirovaniya",
+                "fileName": "2_GO_idiomy_i_patterny_proektirovaniya.pdf"
+            },
+            {
+                "displayName": "book9Golang для профи работа с сетью, многопоточность, структуры данных",
+                "fileName": "3_book9Golang_для_профи_работа_с_сетью,_многопоточность,_структуры_данных.pdf"
+            },
+            {
+                "displayName": "golang 3nbsped 9785446119998 9781801079310 compress",
+                "fileName": "4_golang-3nbsped-9785446119998-9781801079310_compress.pdf"
+            },
+            {
+                "displayName": "Metyu A. Titmus Oblachnyiy Go. Sozdanie nadezhnyih sluzhb v nenadezhnyih okruzheniyah",
+                "fileName": "5_Metyu_A._Titmus_Oblachnyiy_Go._Sozdanie_nadezhnyih_sluzhb_v_nenadezhnyih_okruzheniyah.pdf"
+            },
+            {
+                "displayName": "black hat go",
+                "fileName": "6_black-hat-go.pdf"
+            },
+            {
+                "displayName": "Packt.Mastering.Go.www.EBooksWorld.ir",
+                "fileName": "7_Packt.Mastering.Go.www.EBooksWorld.ir.pdf"
+            }
+        ];
+        // ==========================================================
+
         document.addEventListener('DOMContentLoaded', () => {
-            // КОНСТАНТА: Назва файлу-плейсхолдера для курсу
             const COURSE_FILE_NAME = '1_Фундаментальний_курс_Go.pdf';
-            // ВИПРАВЛЕНО: Повертаємо правильну назву курсу
-            const COURSE_DISPLAY_NAME = 'Фундаментальний курс Go: Детальний синтаксис та основи'; 
+            const list = document.getElementById('literature-list');
+            list.innerHTML = ''; 
 
-            // ЗМІНЕНО: Завантажуємо статичний JSON-файл
-            fetch('/static/literature.json') 
-                .then(response => {
-                    if (!response.ok) {
-                        // Якщо файл не знайдено (404), це помилка
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(books => {
-                    const list = document.getElementById('literature-list');
-                    list.innerHTML = ''; 
+            const books = BOOKS_DATA; // Використовуємо вбудовані дані
 
-                    if (books.length === 0) {
-                        list.innerHTML = '<p>Список літератури порожній.</p>';
-                        return;
-                    }
+            if (books.length === 0) {
+                list.innerHTML = '<p>Список літератури порожній.</p>';
+                return;
+            }
 
-                    books.forEach(book => {
-                        const li = document.createElement('li');
-                        
-                        // Логіка для виведення імені
-                        let displayName = book.displayName;
-                        
-                        if (book.fileName === COURSE_FILE_NAME) {
-                            displayName = COURSE_DISPLAY_NAME;
-                        }
-                        
-                        const fileNameDisplay = book.fileName 
-                            ? `<span class="file-name">(${book.fileName})</span>` 
-                            : '<span class="file-name" style="color:#e06c75;">(Немає імені файлу)</span>';
+            books.forEach(book => {
+                const li = document.createElement('li');
+                
+                let displayName = book.displayName;
+                
+                // Якщо це курс, використовуємо спеціальну назву, якщо потрібно
+                if (book.fileName === COURSE_FILE_NAME) {
+                    // Я видалив рядок "НЕ РОБОЧЕ ПОСИЛАННЯ", щоб не плутати користувача
+                    displayName = book.displayName; 
+                }
+                
+                const fileNameDisplay = book.fileName 
+                    ? `<span class="file-name">(${book.fileName})</span>` 
+                    : '<span class="file-name" style="color:#e06c75;">(Немає імені файлу)</span>';
 
-                        li.innerHTML = `
-                            <a href="reader.html?file=${encodeURIComponent(book.fileName)}" title="Читати ${displayName}">
-                                ${displayName}
-                                ${fileNameDisplay}
-                            </a>
-                        `;
-                        list.appendChild(li);
-                    });
-                })
-                .catch(error => {
-                    console.error('Помилка завантаження літератури:', error);
-                    document.getElementById('literature-list').innerHTML = `
-                        <p style="color: #e06c75;">
-                            Помилка завантаження списку літератури: ${error.message}. Перевірте, чи існує файл /static/literature.json.
-                        </p>
-                    `;
-                });
+                li.innerHTML = `
+                    <a href="reader.html?file=${encodeURIComponent(book.fileName)}" title="Читати ${displayName}">
+                        ${displayName}
+                        ${fileNameDisplay}
+                    </a>
+                `;
+                list.appendChild(li);
+            });
         });
     </script>
 </body>
