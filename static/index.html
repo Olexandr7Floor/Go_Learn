@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go (Golang) Література</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #282c34;
+            color: #f8f8f2;
+            line-height: 1.6;
+            min-height: 100vh;
+            
+            /* === ВИПРАВЛЕНО: КОРИСТУЄМОСЯ ПРАВИЛЬНИМИ ІМЕНАМИ === */
+            background-image: 
+                url('images/go_gropher_left.png'), 
+                url('images/go_gopher_right.png');
+                
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Закріплює зображення при прокручуванні */
+            
+            background-position: 
+                left 50px bottom 50px, /* Зліва, знизу 50px */
+                right 50px bottom 550px; /* Справа, знизу 50px */
+                
+            background-size: 350px; 
+            /* === КІНЕЦЬ ЗОБРАЖЕНЬ === */
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #3e4451;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            padding-top: 40px; 
+            padding-bottom: 40px;
+        }
+        h1 {
+            color: #61afef;
+            border-bottom: 2px solid #56b6c2;
+            padding-bottom: 10px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background-color: #2c313a;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        li:hover {
+            background-color: #4b5263;
+        }
+        a {
+            color: #98c379;
+            text-decoration: none;
+            font-weight: bold;
+            display: block;
+        }
+        a:hover {
+            text-decoration: underline;
+            color: #e5c07b;
+        }
+        .file-name {
+            font-size: 0.8em;
+            color: #7f848e;
+            display: block;
+            margin-top: 5px;
+        }
+        .header-group {
+            display: flex; /* Дозволяє розмістити елементи в ряд */
+            justify-content: space-between; /* Розносить елементи по краях */
+            align-items: center; /* Вирівнює по вертикалі */
+            border-bottom: 2px solid #56b6c2;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            color: #61afef;
+            /* ВИДАЛИТИ: border-bottom: 2px solid #56b6c2; */ 
+            /* ВИДАЛИТИ: padding-bottom: 10px; */
+            margin: 0; /* Прибираємо зовнішні відступи */
+        }
+
+        /* СТИЛЬ ДЛЯ КНОПКИ КУРСУ */
+        .course-button {
+            background-color: #e5c07b; /* Золотистий колір для привернення уваги */
+            color: #282c34;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            white-space: nowrap; /* Забороняє перенесення тексту */
+        }
+
+        .course-button:hover {
+            background-color: #cfad6b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+    
+        <div class="header-group">
+            <h1>Go (Golang) Література</h1>
+            
+            <a 
+                href="https://go.dev/tour/welcome/1" 
+                target="_blank" 
+                class="course-button"
+                title="Відкрити загальний курс Go на Notion"
+            >
+                Загальний курс
+            </a>
+            <a 
+            href="https://pantela.notion.site/Go-EvgenyPantela-2622eb3830de43639fbb7a0e2b7c2757" 
+            target="_blank" 
+            class="course-button"
+            title="Відкрити локальний курс Go"
+        >
+            Фундаментальний курс
+        </a>
+        </div>
+        
+        <p>Оберіть книгу для читання:</p>
+        <ul id="literature-list">
+            </ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/literature')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(books => {
+                    const list = document.getElementById('literature-list');
+                    list.innerHTML = ''; 
+
+                    if (books.length === 0) {
+                        list.innerHTML = '<p>Папка з літературою порожня або не знайдена.</p>';
+                        return;
+                    }
+
+                    books.forEach(book => {
+                        const li = document.createElement('li');
+                        
+                        // Вставлено перевірку book.fileName для запобігання помилки
+                        const fileNameDisplay = book.fileName 
+                            ? `<span class="file-name">(${book.fileName})</span>` 
+                            : '<span class="file-name" style="color:#e06c75;">(Немає імені файлу)</span>';
+
+                        li.innerHTML = `
+                            <a href="reader.html?file=${encodeURIComponent(book.fileName)}" title="Читати ${book.displayName}">
+                                ${book.displayName}
+                                ${fileNameDisplay}
+                            </a>
+                        `;
+                        list.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error('Помилка завантаження літератури:', error);
+                    document.getElementById('literature-list').innerHTML = `
+                        <p style="color: #e06c75;">
+                            Помилка завантаження списку літератури: ${error.message}. Перевірте Go-сервер.
+                        </p>
+                    `;
+                });
+        });
+    </script>
+</body>
+</html>

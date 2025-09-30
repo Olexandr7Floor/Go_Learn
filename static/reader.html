@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Читання Go-Літератури</title>
+    <style>
+        /* ОСНОВНІ СТИЛІ */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #282c34;
+            color: #f8f8f2;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .reader-container {
+            display: flex;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* PDF ЧИТАЛКА (IFRAME) */
+        .pdf-viewer {
+            flex: 2;
+            padding-right: 20px;
+            border-right: 1px solid #3e4451;
+            position: relative;
+        }
+        #pdf-iframe {
+            width: 100%;
+            height: 80vh;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            background-color: white;
+        }
+
+        /* БОКОВА ПАНЕЛЬ: КОМПІЛЯТОР І НОТАТКИ */
+        .tools-sidebar {
+            flex: 1;
+            padding-left: 20px;
+        }
+        h2, h3 {
+            color: #61afef;
+            border-bottom: 1px solid #56b6c2;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+        
+        /* КОМПІЛЯТОР */
+        #code-editor {
+            width: 100%;
+            min-height: 200px;
+            background: #2c313a;
+            color: #f8f8f2;
+            border: 1px solid #56b6c2;
+            padding: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        button {
+            background-color: #98c379;
+            color: #282c34;
+            border: none;
+            padding: 8px 15px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #7ca260;
+        }
+        #output {
+            background: #111;
+            color: #eee;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            min-height: 50px; /* Забезпечення видимості */
+        }
+
+        /* НОТАТКИ */
+        #notes-list div {
+            background-color: #2c313a;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+        #notes-list strong {
+            color: #e5c07b;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="reader-container">
+        <div class="pdf-viewer">
+            <h2>Читання: <span id="file-title">Завантаження...</span></h2>
+            
+            <iframe id="pdf-iframe"></iframe>
+            
+            <button onclick="saveNote()" style="margin-top: 15px;">Зберегти нотатку для поточної сторінки</button>
+            <p style="margin-top: 5px; font-size: 0.9em; color: #b0b0b0;">
+                **Поточна сторінка:** <span id="current-page-display" style="font-weight: bold; color: #98c379;">1</span>.
+                <span id="note-debug" style="color: #e06c75;"></span>
+            </p>
+        </div>
+
+        <div class="tools-sidebar">
+            
+            <h3>Інтерактивний Go-компілятор</h3>
+            <textarea id="code-editor">package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, Go!")
+}
+            </textarea>
+            <button onclick="runCode()">Виконати код</button>
+            <h4>Вивід:</h4>
+            <pre id="output">Тут буде результат виконання коду.</pre>
+
+            <h3>Ваші нотатки</h3>
+            <div id="notes-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // Ініціалізація змінних
+        const urlParams = new URLSearchParams(window.location.search);
+        let fileName = urlParams.get('file'); // Зроблено let для можливості змін
+        let currentPage = 1;
+
+        // ==========================================================
+        // 1. PDF VIEWER LOGIC (IFRAME & Page Tracking)
+        // ==========================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!fileName) {
+                document.getElementById('file-title').textContent = "Помилка: файл не вказано.";
+                document.getElementById('note-debug').textContent = "Не можна зберігати нотатки без імені файлу.";
+                return;
+            }
+            
+            const decodedFileName = decodeURIComponent(fileName);
+            document.getElementById('file-title').textContent = decodedFileName;
+            
+            // Створення URL для IFRAME, виходячи з вашої структури
+            const viewerPath = 'js/pdfjs_viewer/web/viewer.html';
+            const pdfURL = `/literature/${fileName}`;
+            const iframeURL = `${viewerPath}?file=${encodeURIComponent(pdfURL)}`;
+            
+            const iframe = document.getElementById('pdf-iframe');
+            iframe.src = iframeURL;
+            
+            // Слухаємо повідомлення від IFRAME для оновлення номера сторінки
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'pagechange' && event.data.pageNumber) {
+                    currentPage = event.data.pageNumber;
+                    document.getElementById('current-page-display').textContent = currentPage;
+                    loadNotes(); // Оновлюємо нотатки, щоб виділити поточну сторінку
+                }
+            });
+
+            loadNotes();
+        });
+
+        // ==========================================================
+        // 2. GO COMPILER LOGIC (Виправлення виводу)
+        // ==========================================================
+
+        function runCode() {
+            const code = document.getElementById('code-editor').value;
+            const outputElement = document.getElementById('output');
+            outputElement.textContent = 'Виконання коду...';
+            
+            const data = new URLSearchParams();
+            data.append('body', code);
+            data.append('version', 2);
+
+            fetch('/api/run-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: data,
+            })
+            .then(response => {
+                 if (!response.ok) {
+                    throw new Error(`Помилка мережі (HTTP ${response.status})`);
+                }
+                return response.json();
+            })
+            .then(result => {
+                let output = '';
+                
+                // 1. Перевірка помилок компіляції (повертаються Go Playground)
+                if (result.Errors) {
+                    output = 'Помилка компіляції:\n' + result.Errors;
+                } 
+                // 2. Збір виводу з масиву Events
+                else if (result.Events) {
+                    // Використовуємо reduce для коректного збору даних з усіх подій
+                    output = result.Events.reduce((acc, event) => acc + event.Data, '');
+                } 
+                // 3. Якщо немає ні помилок, ні виводу
+                else {
+                    output = 'Код виконано, але вивід відсутній.';
+                }
+                
+                outputElement.textContent = output;
+            })
+            .catch(error => {
+                outputElement.textContent = `Помилка: ${error.message}`;
+                console.error('Run Code Error:', error);
+            });
+        }
+
+        // ==========================================================
+        // 3. LOCAL STORAGE NOTES LOGIC (Виправлення зберігання)
+        // ==========================================================
+
+        function getNotesKey() {
+            // Переконаємося, що ми використовуємо коректне, декодоване ім'я файлу
+            if (!fileName) return null;
+            return `go_notes_${fileName}`;
+        }
+        
+        function saveNote() {
+            const notesKey = getNotesKey();
+            
+            if (!notesKey) {
+                alert('Помилка: Неможливо зберегти нотатку, оскільки не знайдено назви файлу.');
+                return;
+            }
+
+            let notes;
+            try {
+                notes = JSON.parse(localStorage.getItem(notesKey)) || [];
+            } catch (e) {
+                console.error("Помилка парсингу нотаток з localStorage", e);
+                notes = [];
+            }
+
+            const newNote = prompt(`Введіть нотатку для поточної сторінки (${currentPage}):`);
+            if (!newNote) return;
+
+            notes.push({ page: currentPage, text: newNote, date: new Date().toLocaleString() });
+            
+            try {
+                 localStorage.setItem(notesKey, JSON.stringify(notes));
+                 console.log(`Нотатка збережена успішно під ключем: ${notesKey}`);
+                 alert('Нотатка успішно збережена!');
+            } catch (e) {
+                console.error("Помилка запису в localStorage", e);
+                alert('Помилка: Не вдалося записати нотатку в локальне сховище браузера.');
+            }
+            
+            loadNotes();
+        }
+
+        function loadNotes() {
+            const notesKey = getNotesKey();
+            const notesList = document.getElementById('notes-list');
+            notesList.innerHTML = '';
+            
+            if (!notesKey) return;
+
+            let notes;
+            try {
+                notes = JSON.parse(localStorage.getItem(notesKey)) || [];
+            } catch (e) {
+                console.error("Помилка парсингу нотаток при завантаженні", e);
+                notes = [];
+            }
+            
+            if (notes.length === 0) {
+                notesList.innerHTML = '<p style="color: #7f848e;">Тут будуть нотатки, які ви додасте.</p>';
+                return;
+            }
+            
+            notes.sort((a, b) => a.page - b.page);
+
+            notes.forEach(note => {
+                const div = document.createElement('div');
+                // Виділяємо нотатки для поточної сторінки
+                const highlightClass = (note.page === currentPage) ? ' style="border-left: 3px solid #61afef;"' : '';
+                
+                div.innerHTML = `
+                    <div ${highlightClass}>
+                        <strong>Сторінка ${note.page}:</strong> ${note.text}
+                        <small style="display: block; color: #7f848e;">${note.date}</small>
+                    </div>
+                `;
+                notesList.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
