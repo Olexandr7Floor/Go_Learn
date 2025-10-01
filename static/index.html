@@ -12,83 +12,124 @@
             color: #f8f8f2;
             line-height: 1.6;
             min-height: 100vh;
-
-            /* Фонові гофери */
+        
             background-image: 
                 url('images/go_gopher_left.png'), 
                 url('images/go_gopher_right.png');
             background-repeat: no-repeat;
             background-attachment: fixed;
-            background-position: 
-                left 50px bottom 50px, 
-                right 50px bottom 500px; 
+            background-position: left 50px bottom 50px, right 50px bottom 500px; 
             background-size: 400px;
         }
+        
         .container {
-            max-width: 900px;
+            max-width: 95%;
+            width: 900px;
             margin: 0 auto;
             padding: 20px;
             background-color: #3e4451;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            padding-top: 40px; 
-            padding-bottom: 40px;
         }
+        
         h1 {
             color: #61afef;
-            margin: 0 0 20px 0;
+            margin-bottom: 20px;
+            font-size: clamp(1.5rem, 2vw, 2.5rem);
         }
+        
         .courses {
             display: flex;
-            gap: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
             margin-bottom: 25px;
         }
+        
         .course-button {
             background-color: #e5c07b;
             color: #282c34;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 15px;
             cursor: pointer;
             border-radius: 5px;
             text-decoration: none;
             font-weight: bold;
             transition: background-color 0.2s;
-            white-space: nowrap;
+            flex: 1 1 auto;
+            text-align: center;
         }
+        
         .course-button:hover {
             background-color: #cfad6b;
         }
+        
         ul {
             list-style: none;
             padding: 0;
         }
+        
         li {
             background-color: #2c313a;
             margin-bottom: 10px;
-            padding: 15px;
+            padding: 12px;
             border-radius: 5px;
             transition: background-color 0.3s;
         }
+        
         li:hover {
             background-color: #4b5263;
         }
+        
         a {
             color: #98c379;
             text-decoration: none;
             font-weight: bold;
             display: block;
         }
+        
         a:hover {
             text-decoration: underline;
             color: #e5c07b;
         }
+        
         .file-name {
             font-size: 0.8em;
             color: #7f848e;
             display: block;
             margin-top: 5px;
         }
-    </style>
+        
+        /* Медіа-запити для адаптивності */
+        @media (max-width: 768px) {
+            body {
+                background-position: left 20px bottom 20px, right 20px bottom 200px;
+                background-size: 150px;
+            }
+            .container {
+                padding: 15px;
+            }
+            .courses {
+                flex-direction: column;
+            }
+            .course-button {
+                width: 100%;
+            }
+        }
+        
+        @media (min-width: 2560px) {
+            h1 {
+                font-size: 4rem;
+            }
+            .container {
+                max-width: 2000px;
+            }
+            .course-button {
+                font-size: 1.5rem;
+                padding: 15px 25px;
+            }
+        }
+        </style>
+        
 </head>
 <body>
     <div class="container">
