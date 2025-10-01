@@ -218,10 +218,17 @@
         // Я ПОВЕРТАЮ encodeURIComponent, але ВИДАЛЯЮ ЗАЙВИЙ СЛЕДЖ У reader.html
         
         // !!! КРИТИЧНЕ ВИПРАВЛЕННЯ ШЛЯХУ (УСУНЕННЯ ПОДВІЙНОГО ШЛЯХУ) !!!
-        const pdfViewerPath = `/static/js/pdfjs_viewer/web/viewer.html?file=/${encodeURIComponent(fileName)}`;
-    
+// ...
+        // === ВИКОРИСТАННЯ ЧИСТИХ ВІДНОСНИХ ШЛЯХІВ (Ваш варіант) ===
+        const viewerPath = 'js/pdfjs_viewer/web/viewer.html';
+        const pdfURL = `/literature/${fileName}`; // Абсолютний шлях до PDF-файлу
+        
+        // Формуємо фінальний URL
+        const iframeURL = `${viewerPath}?file=${encodeURIComponent(pdfURL)}`;
+
         // Встановлюємо src для iframe
-        document.getElementById('pdf-iframe').src = pdfViewerPath;  
+        document.getElementById('pdf-iframe').src = iframeURL;  
+// ...
 
         // Завантаження нотаток при старті
         loadNotes(currentPage);
