@@ -7,7 +7,6 @@
     <style>
         :root {
             /* Гнучкі розміри шрифту для основного тексту */
-            --font-size-base: 1.1rem;
             --font-size-clamp: clamp(1rem, 1.2vw, 1.3rem);
         }
         
@@ -22,26 +21,32 @@
             /* Вирівнювання по центру для великих моніторів */
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Вирівнювання зверху, щоб контейнер не займав всю висоту */
-            padding-top: 30px; /* Невеликий відступ зверху */
+            align-items: flex-start;
+            padding-top: 30px;
             padding-bottom: 30px;
-    
-            /* Фонові Гофери */
+
+            /* === ФОНОВІ ГОФЕРИ === */
             background-image: 
                 url('images/go_gopher_left.png'), 
                 url('images/go_gopher_right.png');
             background-repeat: no-repeat;
             background-attachment: fixed;
-            background-position: left 50px bottom 50px, right 50px bottom 500px; 
-            background-size: clamp(150px, 20vw, 400px); /* Адаптивний розмір зображень */
+            
+            /* Гнучкий розмір: від 200px до 500px */
+            background-size: clamp(200px, 25vw, 500px); 
+            
+            /* Позиціонування: один знизу, інший зверху */
+            background-position: 
+                left 100px bottom 100px, 
+                right 100px top 100px;
         }
         
         .container {
             /* Обмеження ширини для 4K+ моніторів */
             width: 100%;
-            max-width: 1400px; /* Обмежуємо максимальну ширину */
-            min-width: 300px; /* Мінімальна ширина для мобільних */
-            margin: 0 20px; /* Невеликий бічний відступ на великих екранах */
+            max-width: 1400px; 
+            min-width: 300px; 
+            margin: 0 20px; 
             padding: clamp(20px, 3vw, 40px);
             
             background-color: #3e4451;
@@ -61,12 +66,12 @@
         p {
             font-size: var(--font-size-clamp);
         }
-    
+
         /* Кнопки курсу */
         .courses {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px; /* Збільшуємо простір між кнопками */
+            gap: 15px; 
             margin-bottom: 30px;
         }
         
@@ -80,7 +85,7 @@
             text-decoration: none;
             font-weight: bold;
             transition: background-color 0.2s;
-            flex: 1 1 45%; /* Дозволяє двом кнопкам займати майже половину ширини */
+            flex: 1 1 45%; 
             text-align: center;
             font-size: var(--font-size-clamp);
         }
@@ -121,7 +126,7 @@
         }
         
         .file-name {
-            font-size: 0.7em; /* Трохи менше, ніж основний шрифт */
+            font-size: 0.7em; 
             color: #7f848e;
             display: block;
             margin-top: 5px;
@@ -132,18 +137,19 @@
         /* Мобільні пристрої (до 600px) */
         @media (max-width: 600px) {
             body {
-                /* Прибираємо бічний відступ, щоб зайняти всю ширину */
                 padding: 10px 0; 
                 align-items: flex-start;
+                /* ВИМИКАЄМО ГОФЕРІВ НА МАЛИХ ЕКРАНАХ */
+                background-image: none;
             }
-    
+
             .container {
                 margin: 0;
-                border-radius: 0; /* Вигляд "від краю до краю" */
+                border-radius: 0; 
                 padding: 15px;
                 box-shadow: none;
             }
-    
+
             .courses {
                 flex-direction: column;
                 gap: 10px;
@@ -154,13 +160,8 @@
                 padding: 12px;
                 font-size: 1rem;
             }
-    
-            /* Прибираємо гоферів на дуже маленьких екранах, щоб не заважали */
-            body {
-                background-image: none;
-            }
         }
-    
+
         /* Планшети (601px - 1024px) */
         @media (min-width: 601px) and (max-width: 1024px) {
             .container {
@@ -168,24 +169,29 @@
                 margin: 0 auto;
             }
             body {
-                /* Переміщуємо гоферів ближче до центру */
-                background-position: left 20px bottom 20px, right 20px bottom 200px;
+                /* Зменшуємо розмір, але зберігаємо видимість */
+                background-size: clamp(150px, 20vw, 300px);
+                /* Переміщуємо ближче до країв */
+                background-position: 
+                    left 20px bottom 20px, 
+                    right 20px top 20px; 
             }
         }
-    
-        /* Екстремально великі монітори (4K, 2560px+) */
+
+        /* Екстремально великі монітори (4K, 2000px+) */
         @media (min-width: 2000px) {
             body {
-                /* Відсуваємо гоферів від вмісту */
-                background-position: left 200px bottom 50px, right 200px bottom 600px;
-                background-size: 500px;
+                /* Робимо гоферів дуже великими та відсуваємо їх далі від контейнера */
+                background-size: 600px;
+                background-position: 
+                    left 300px bottom 150px, 
+                    right 300px top 150px; 
             }
             .container {
                 max-width: 1800px;
             }
         }
     </style>
-        
 </head>
 <body>
     <div class="container">
@@ -255,6 +261,10 @@
 
             BOOKS_DATA.forEach(book => {
                 const li = document.createElement('li');
+
+                // ПРИМІТКА: Якщо ви перемістили папку 'literature' в 'static' 
+                // (згідно з попередніми порадами), вам потрібно оновити fileName тут,
+                // якщо він не був оновлений: "fileName": "literature/1_GO..."
 
                 const fileNameDisplay = book.fileName 
                     ? `<span class="file-name">(${book.fileName})</span>` 
