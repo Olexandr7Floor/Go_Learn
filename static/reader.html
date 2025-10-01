@@ -182,13 +182,13 @@
     <div class="tools-sidebar">
         <h3>Інтерактивний Go-компілятор</h3>
         <p style="font-size: 0.8em; color: #7f848e;">Використовує Go Playground API через Cloudflare Function.</p>
-        <textarea id="go-code-input">// package main
-// 
-// import "fmt"
-// 
-// func main() {
-//  fmt.Println("Hello, Go!")
-// }</textarea>
+        <textarea id="go-code-input"> package main
+ 
+ import "fmt"
+ 
+ func main() {
+  fmt.Println("Hello, Go!")
+ }</textarea>
         <button onclick="runCode()" class="run-button">Виконати код</button>
         <pre id="go-output">Натисніть "Виконати код", щоб побачити результат.</pre>
 
