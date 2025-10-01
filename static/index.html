@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Go (Golang) Література</title>
     <style>
+        :root {
+            /* Гнучкі розміри шрифту для основного тексту */
+            --font-size-base: 1.1rem;
+            --font-size-clamp: clamp(1rem, 1.2vw, 1.3rem);
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -12,57 +18,78 @@
             color: #f8f8f2;
             line-height: 1.6;
             min-height: 100vh;
-        
+            
+            /* Вирівнювання по центру для великих моніторів */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Вирівнювання зверху, щоб контейнер не займав всю висоту */
+            padding-top: 30px; /* Невеликий відступ зверху */
+            padding-bottom: 30px;
+    
+            /* Фонові Гофери */
             background-image: 
                 url('images/go_gopher_left.png'), 
                 url('images/go_gopher_right.png');
             background-repeat: no-repeat;
             background-attachment: fixed;
             background-position: left 50px bottom 50px, right 50px bottom 500px; 
-            background-size: 400px;
+            background-size: clamp(150px, 20vw, 400px); /* Адаптивний розмір зображень */
         }
         
         .container {
-            max-width: 95%;
-            width: 900px;
-            margin: 0 auto;
-            padding: 20px;
+            /* Обмеження ширини для 4K+ моніторів */
+            width: 100%;
+            max-width: 1400px; /* Обмежуємо максимальну ширину */
+            min-width: 300px; /* Мінімальна ширина для мобільних */
+            margin: 0 20px; /* Невеликий бічний відступ на великих екранах */
+            padding: clamp(20px, 3vw, 40px);
+            
             background-color: #3e4451;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
         
         h1 {
             color: #61afef;
-            margin-bottom: 20px;
-            font-size: clamp(1.5rem, 2vw, 2.5rem);
+            border-bottom: 2px solid #56b6c2;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            /* Гнучкий розмір заголовка */
+            font-size: clamp(2rem, 4vw, 3.5rem); 
         }
         
+        p {
+            font-size: var(--font-size-clamp);
+        }
+    
+        /* Кнопки курсу */
         .courses {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 25px;
+            gap: 15px; /* Збільшуємо простір між кнопками */
+            margin-bottom: 30px;
         }
         
         .course-button {
             background-color: #e5c07b;
             color: #282c34;
             border: none;
-            padding: 10px 15px;
+            padding: clamp(10px, 1.5vw, 15px) 20px;
             cursor: pointer;
             border-radius: 5px;
             text-decoration: none;
             font-weight: bold;
             transition: background-color 0.2s;
-            flex: 1 1 auto;
+            flex: 1 1 45%; /* Дозволяє двом кнопкам займати майже половину ширини */
             text-align: center;
+            font-size: var(--font-size-clamp);
         }
         
         .course-button:hover {
             background-color: #cfad6b;
         }
         
+        /* Список літератури */
         ul {
             list-style: none;
             padding: 0;
@@ -70,10 +97,11 @@
         
         li {
             background-color: #2c313a;
-            margin-bottom: 10px;
-            padding: 12px;
+            margin-bottom: 12px;
+            padding: clamp(12px, 2vw, 20px);
             border-radius: 5px;
             transition: background-color 0.3s;
+            font-size: var(--font-size-clamp);
         }
         
         li:hover {
@@ -93,42 +121,70 @@
         }
         
         .file-name {
-            font-size: 0.8em;
+            font-size: 0.7em; /* Трохи менше, ніж основний шрифт */
             color: #7f848e;
             display: block;
             margin-top: 5px;
         }
         
-        /* Медіа-запити для адаптивності */
-        @media (max-width: 768px) {
+        /* === МЕДІА-ЗАПИТИ === */
+        
+        /* Мобільні пристрої (до 600px) */
+        @media (max-width: 600px) {
             body {
-                background-position: left 20px bottom 20px, right 20px bottom 200px;
-                background-size: 150px;
+                /* Прибираємо бічний відступ, щоб зайняти всю ширину */
+                padding: 10px 0; 
+                align-items: flex-start;
             }
+    
             .container {
+                margin: 0;
+                border-radius: 0; /* Вигляд "від краю до краю" */
                 padding: 15px;
+                box-shadow: none;
             }
+    
             .courses {
                 flex-direction: column;
+                gap: 10px;
             }
+            
             .course-button {
-                width: 100%;
+                flex: 1 1 100%;
+                padding: 12px;
+                font-size: 1rem;
+            }
+    
+            /* Прибираємо гоферів на дуже маленьких екранах, щоб не заважали */
+            body {
+                background-image: none;
             }
         }
-        
-        @media (min-width: 2560px) {
-            h1 {
-                font-size: 4rem;
+    
+        /* Планшети (601px - 1024px) */
+        @media (min-width: 601px) and (max-width: 1024px) {
+            .container {
+                max-width: 90%;
+                margin: 0 auto;
+            }
+            body {
+                /* Переміщуємо гоферів ближче до центру */
+                background-position: left 20px bottom 20px, right 20px bottom 200px;
+            }
+        }
+    
+        /* Екстремально великі монітори (4K, 2560px+) */
+        @media (min-width: 2000px) {
+            body {
+                /* Відсуваємо гоферів від вмісту */
+                background-position: left 200px bottom 50px, right 200px bottom 600px;
+                background-size: 500px;
             }
             .container {
-                max-width: 2000px;
-            }
-            .course-button {
-                font-size: 1.5rem;
-                padding: 15px 25px;
+                max-width: 1800px;
             }
         }
-        </style>
+    </style>
         
 </head>
 <body>
