@@ -1,400 +1,44 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Читання Go Літератури</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background-color: #282c34;
-            color: #f8f8f2;
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-        }
-        .reader-container {
-            display: flex;
-            width: 95%;
-            max-width: 1600px;
-            margin-top: 20px;
-        }
-        .pdf-viewer {
-            flex: 3; /* Займає більшу частину простору */
-            padding-right: 20px;
-        }
-        #pdf-iframe {
-            width: 100%;
-            height: 80vh; /* Висота для читалки */
-            border: 2px solid #56b6c2;
-            border-radius: 8px;
-        }
-        .tools-sidebar {
-            flex: 1; /* Займає менше простору */
-            min-width: 300px;
-            padding: 20px;
-            background-color: #3e4451;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        h2, h3 {
-            color: #61afef;
-            border-bottom: 1px solid #56b6c2;
-            padding-bottom: 5px;
-            margin-top: 0;
-        }
-        /* СТИЛЬ ДЛЯ КНОПКИ ПОВЕРНЕННЯ */
-        .back-button {
-            background-color: #56b6c2;
-            color: #282c34;
-            border: none;
-            padding: 8px 15px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            border-radius: 4px;
-            text-decoration: none;
-            display: inline-block;
-            font-weight: bold;
-        }
-        .back-button:hover {
-            background-color: #4da3af;
-        }
-
-        /* СТИЛІ КОМПІЛЯТОРА */
-        #go-code-input {
-            width: 100%;
-            min-height: 150px;
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            border: 1px solid #56b6c2;
-            padding: 10px;
-            box-sizing: border-box;
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 14px;
-            resize: vertical;
-        }
-        #go-output {
-            width: 100%;
-            min-height: 100px;
-            background-color: #1e1e1e;
-            color: #98c379; /* Зелений для виводу */
-            border: 1px solid #7f848e;
-            padding: 10px;
-            margin-top: 10px;
-            box-sizing: border-box;
-            font-family: 'Consolas', 'Courier New', monospace;
-            white-space: pre-wrap;
-            overflow-x: auto;
-        }
-        .run-button {
-            background-color: #98c379;
-            color: #282c34;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .run-button:hover {
-            background-color: #87b269;
-        }
-
-        /* СТИЛІ НОТАТОК */
-        .note-item {
-            background-color: #2c313a;
-            padding: 10px;
-            border-left: 3px solid #61afef;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            word-wrap: break-word;
-        }
-        .note-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8em;
-            color: #7f848e;
-            margin-bottom: 5px;
-        }
-        .note-delete {
-            color: #e06c75;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        #new-note-input {
-            width: 100%;
-            min-height: 50px;
-            background-color: #2c313a;
-            color: #f8f8f2;
-            border: 1px solid #4b5263;
-            padding: 8px;
-            box-sizing: border-box;
-            margin-top: 10px;
-            resize: vertical;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Reader</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+    #pdf-iframe {
+      border: none;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 <body>
 
-<div class="reader-container">
-    <div class="pdf-viewer">
-        
-        <a href="index.html" class="back-button">← Повернутися до списку</a>
-        
-        <h2>Читання: <span id="file-title">Завантаження...</span></h2>
-        
-        <iframe id="pdf-iframe" title="PDF Viewer"></iframe>
-        
-        <textarea id="new-note-input" placeholder="Ваша нова нотатка..."></textarea>
-        <button onclick="saveNote()" class="run-button" style="margin-top: 10px;">Зберегти нотатку для поточної сторінки</button>
-        <p style="margin-top: 10px; font-size: 0.9em; color: #b0b0b0;">
-            **Поточна сторінка:** <span id="current-page-display" style="font-weight: bold; color: #98c379;">1</span>.
-            <span id="note-debug" style="color: #e06c75;"></span>
-        </p>
-    </div>
+  <!-- IFRAME з PDF -->
+  <iframe id="pdf-iframe"
+          title="PDF Viewer"
+          src=""
+          allowfullscreen></iframe>
 
-    <div class="tools-sidebar">
-        
-        <h3>Інтерактивний Go-компілятор</h3>
-        <p style="font-size: 0.8em; color: #7f848e;">Використовує Go Playground API через Cloudflare Function.</p>
-        
-        <textarea id="go-code-input">// package main
-// 
-// import "fmt"
-// 
-// func main() {
-//  fmt.Println("Hello, Go!")
-// }</textarea>
-        <button onclick="runCode()" class="run-button">Виконати код</button>
-        <pre id="go-output">Натисніть "Виконати код", щоб побачити результат.</pre>
+  <script>
+    // Приклад: беремо PDF з URL-параметра ?file=1_GO_idiomy_i_patterny_proektirovaniya.pdf
+    const params = new URLSearchParams(window.location.search);
+    const fileName = params.get("file") || "1_GO_idiomy_i_patterny_proektirovaniya.pdf";
 
-        <h3 style="margin-top: 25px;">Ваші Нотатки (<span id="notes-page-count">0</span>)</h3>
-        <p style="font-size: 0.8em; color: #7f848e;">Зберігаються у локальному сховищі браузера.</p>
-        <div id="notes-list">
-            <p style="color: #b0b0b0;">Нотаток для цієї сторінки поки немає.</p>
-        </div>
-    </div>
-</div>
+    // Формуємо шлях до PDF.js viewer
+    const viewer = "/static/js/pdfjs_viewer/web/viewer.html";
+    const pdfPath = `/literature/${encodeURIComponent(fileName)}`;
+    const iframeSrc = `${viewer}?file=${pdfPath}`;
 
-<script>
-    // КОНСТАНТИ
-    const COURSE_FILE_NAME = "1_Фундаментальний_курс_Go.pdf";
-    const LOCAL_COURSE_PATH = "/saveweb2zip-com-pantela-notion-site/index.html"; 
+    // Підставляємо в iframe
+    document.getElementById("pdf-iframe").src = iframeSrc;
+  </script>
 
-    const urlParams = new URLSearchParams(window.location.search);
-    let fileName = urlParams.get('file'); 
-    let currentPage = 1;
-    const notesStorageKey = `go_notes_${fileName}`;
-
-    // === КРИТИЧНА ЛОГІКА: ПЕРЕНАПРАВЛЕННЯ ЛОКАЛЬНОГО КУРСУ ===
-    if (fileName === COURSE_FILE_NAME) {
-        // Перенаправляємо, оскільки це HTML-курс, а не PDF
-        window.location.replace(LOCAL_COURSE_PATH);
-        throw new Error('Перенаправлення на локальний курс...'); 
-    }
-    // ========================================================
-
-    document.addEventListener('DOMContentLoaded', () => {
-        if (!fileName) {
-            document.getElementById('file-title').textContent = "Помилка: Файл не вказано.";
-            return;
-        }
-        
-        // Зберігаємо декодоване ім'я для відображення
-        let displayTitle = decodeURIComponent(fileName).replace(/_/g, ' ');
-        if (displayTitle.indexOf('.pdf') > -1) {
-            // Видаляємо префікс '1_' та розширення '.pdf' для чистого відображення
-            displayTitle = displayTitle.substring(displayTitle.indexOf('_') + 1, displayTitle.length - 4);
-        }
-        document.getElementById('file-title').textContent = displayTitle;
-
-        // Встановлення шляху до PDF Viewer (ВИПРАВЛЕНО)
-        // ВИДАЛЕНО encodeURIComponent навколо fileName, оскільки він уже закодований у reader.html, 
-        // або використовуйте ТІЛЬКИ ОДИН РАЗ, щоб уникнути подвійного кодування.
-        // Я ПОВЕРТАЮ encodeURIComponent, але ВИДАЛЯЮ ЗАЙВИЙ СЛЕДЖ У reader.html
-        
-        // !!! КРИТИЧНЕ ВИПРАВЛЕННЯ ШЛЯХУ (УСУНЕННЯ ПОДВІЙНОГО ШЛЯХУ) !!!
-        const pdfViewerPath = `/static/js/pdfjs_viewer/web/viewer.html?file=${encodeURIComponent(fileName)}`;
-    
-        // Встановлюємо src для iframe
-        document.getElementById('pdf-iframe').src = pdfViewerPath;  
-
-        // Завантаження нотаток при старті
-        loadNotes(currentPage);
-    });
-
-    // Обробка повідомлень від iframe про зміну сторінки
-    window.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'pagechange' && event.data.pageNumber) {
-            const newPage = event.data.pageNumber;
-            if (newPage !== currentPage) {
-                currentPage = newPage;
-                document.getElementById('current-page-display').textContent = currentPage;
-                loadNotes(currentPage);
-            }
-        }
-    });
-
-
-    // === ЛОГІКА НОТАТОК ===
-
-    function getAllNotes() {
-        try {
-            const notes = localStorage.getItem(notesStorageKey);
-            return notes ? JSON.parse(notes) : [];
-        } catch (e) {
-            console.error("Помилка читання localStorage", e);
-            document.getElementById('note-debug').textContent = 'Помилка завантаження нотаток.';
-            return [];
-        }
-    }
-
-    function saveAllNotes(notes) {
-        try {
-            localStorage.setItem(notesStorageKey, JSON.stringify(notes));
-        } catch (e) {
-            console.error("Помилка запису localStorage", e);
-            document.getElementById('note-debug').textContent = 'Помилка збереження нотаток.';
-        }
-    }
-
-    function loadNotes(page) {
-        const notes = getAllNotes().filter(note => note.page === page);
-        const notesListDiv = document.getElementById('notes-list');
-        notesListDiv.innerHTML = '';
-        document.getElementById('notes-page-count').textContent = notes.length;
-
-        if (notes.length === 0) {
-            notesListDiv.innerHTML = '<p style="color: #b0b0b0;">Нотаток для цієї сторінки поки немає.</p>';
-            return;
-        }
-
-        notes.forEach((note, index) => {
-            const noteDiv = document.createElement('div');
-            noteDiv.className = 'note-item';
-            noteDiv.innerHTML = `
-                <div class="note-header">
-                    <span>${new Date(note.date).toLocaleString()}</span>
-                    <span class="note-delete" data-index="${index}" onclick="deleteNote(${note.page}, ${index})">❌ Видалити</span>
-                </div>
-                <p>${note.text}</p>
-            `;
-            notesListDiv.appendChild(noteDiv);
-        });
-    }
-
-    function saveNote() {
-        const noteTextarea = document.getElementById('new-note-input');
-        const text = noteTextarea.value.trim();
-
-        if (text === "") {
-            document.getElementById('note-debug').textContent = 'Будь ласка, введіть текст нотатки.';
-            return;
-        }
-
-        const newNote = {
-            page: currentPage,
-            text: text,
-            date: new Date().toISOString()
-        };
-
-        const allNotes = getAllNotes();
-        allNotes.push(newNote);
-        saveAllNotes(allNotes);
-
-        noteTextarea.value = '';
-        document.getElementById('note-debug').textContent = 'Нотатку збережено!';
-        setTimeout(() => document.getElementById('note-debug').textContent = '', 3000);
-        loadNotes(currentPage);
-    }
-
-    // Зроблено глобальною, щоб працювала з onclick
-    window.deleteNote = function(pageToDelete, indexInPage) {
-        let allNotes = getAllNotes();
-        // Фільтруємо нотатки, які належать до поточної сторінки
-        const pageNotes = allNotes.filter(note => note.page === pageToDelete);
-        
-        if (indexInPage >= 0 && indexInPage < pageNotes.length) {
-            const noteToDelete = pageNotes[indexInPage];
-            
-            // Знаходимо індекс цієї конкретної нотатки в повному масиві
-            const fullIndex = allNotes.findIndex(note => 
-                note.page === noteToDelete.page && 
-                note.text === noteToDelete.text && 
-                note.date === noteToDelete.date
-            );
-            
-            if (fullIndex !== -1) {
-                allNotes.splice(fullIndex, 1);
-                saveAllNotes(allNotes);
-                loadNotes(currentPage); 
-            }
-        }
-    }
-
-    window.saveNote = saveNote;
-
-
-    // === ЛОГІКА КОМПІЛЯТОРА ===
-    
-// static/reader.html (Оновлена функція runCode)
-async function runCode() {
-    const codeInput = document.getElementById('go-code-input');
-    const outputElement = document.getElementById('go-output');
-    const code = codeInput.value;
-    
-    outputElement.textContent = 'Компіляція...';
-    
-    try {
-        // Використовуємо абсолютний шлях до Cloudflare Function:
-        const response = await fetch('/api/run-code', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-            },
-            body: `version=2&body=${encodeURIComponent(code)}`
-        });
-        
-        if (!response.ok) {
-            // Виводимо більш детальну помилку, якщо функція Cloudflare недоступна
-            const errorText = await response.text();
-            throw new Error(`Помилка Cloudflare Function (HTTP ${response.status}). Перевірте logs: ${errorText.substring(0, 100)}...`);
-        }
-
-        const data = await response.json();
-
-        let output = '';
-        if (data.Errors) {
-            output += `ПОМИЛКА КОМПІЛЯЦІЇ:\n${data.Errors}\n`;
-        }
-        if (data.Events) {
-            data.Events.forEach(event => {
-                if (event.Kind === 'stdout') {
-                    output += event.Message;
-                }
-                if (event.Kind === 'stderr') {
-                     output += `[STDERR]: ${event.Message}`;
-                }
-            });
-        }
-        
-        if (!output && !data.Errors) {
-             output = "Код успішно виконано (немає виводу).";
-        }
-        
-        outputElement.textContent = output;
-
-    } catch (error) {
-        console.error('Помилка виконання коду:', error);
-        outputElement.textContent = `КРИТИЧНА ПОМИЛКА: Не вдалося з'єднатися з компілятором. ${error.message}`;
-    }
-}
-
-window.runCode = runCode;
-</script>
 </body>
-</html> 
+</html>
