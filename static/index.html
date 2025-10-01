@@ -12,22 +12,17 @@
             color: #f8f8f2;
             line-height: 1.6;
             min-height: 100vh;
-            
-            /* === СТИЛІ ФОНОВИХ ЗОБРАЖЕНЬ (Гофери) === */
-            /* Виправлено: 'gopher' та позиціонування */
+
+            /* Фонові гофери */
             background-image: 
                 url('images/go_gopher_left.png'), 
                 url('images/go_gopher_right.png');
-                
             background-repeat: no-repeat;
-            background-attachment: fixed; 
-            
+            background-attachment: fixed;
             background-position: 
                 left 50px bottom 50px, 
                 right 50px bottom 500px; 
-                
-            background-size: 400px; 
-            /* === КІНЕЦЬ ЗОБРАЖЕНЬ === */
+            background-size: 400px;
         }
         .container {
             max-width: 900px;
@@ -39,14 +34,30 @@
             padding-top: 40px; 
             padding-bottom: 40px;
         }
-        
-        /* ЧИСТИЙ ЗАГОЛОВОК */
         h1 {
             color: #61afef;
-            border-bottom: 2px solid #56b6c2;
-            padding-bottom: 10px;
+            margin: 0 0 20px 0;
         }
-        
+        .courses {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .course-button {
+            background-color: #e5c07b;
+            color: #282c34;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .course-button:hover {
+            background-color: #cfad6b;
+        }
         ul {
             list-style: none;
             padding: 0;
@@ -67,13 +78,9 @@
             font-weight: bold;
             display: block;
         }
-        /* Спеціальний стиль для курсу (перший елемент) */
-        li:first-child a {
-            color: #e5c07b;
-        }
         a:hover {
             text-decoration: underline;
-            color: #cfad6b;
+            color: #e5c07b;
         }
         .file-name {
             font-size: 0.8em;
@@ -85,9 +92,27 @@
 </head>
 <body>
     <div class="container">
-        
         <h1>Go (Golang) Література</h1>
-        
+
+        <div class="courses">
+            <a 
+                href="https://go.dev/tour/welcome/1" 
+                target="_blank" 
+                class="course-button"
+                title="Відкрити загальний курс Go"
+            >
+                Загальний курс
+            </a>
+            <a 
+                href="https://pantela.notion.site/Go-EvgenyPantela-2622eb3830de43639fbb7a0e2b7c2757" 
+                target="_blank" 
+                class="course-button"
+                title="Відкрити локальний курс Go"
+            >
+                Фундаментальний курс
+            </a>
+        </div>
+
         <p>Оберіть книгу для читання:</p>
         <ul id="literature-list">
             <p>Завантаження списку...</p>
@@ -95,12 +120,7 @@
     </div>
 
     <script>
-        // === ВБУДОВАНІ JSON-ДАНІ (ВИРІШЕННЯ ПРОБЛЕМИ КОДУВАННЯ) ===
         const BOOKS_DATA = [
-            {
-                "displayName": "Фундаментальний курс Go: Детальний синтаксис та основи",
-                "fileName": "1_Фундаментальний_курс_Go.pdf"
-            },
             {
                 "displayName": "GO idiomy i patterny proektirovaniya",
                 "fileName": "1_GO_idiomy_i_patterny_proektirovaniya.pdf"
@@ -126,38 +146,26 @@
                 "fileName": "6_Packt.Mastering.Go.www.EBooksWorld.ir.pdf"
             }
         ];
-        // ==========================================================
 
         document.addEventListener('DOMContentLoaded', () => {
-            const COURSE_FILE_NAME = '1_Фундаментальний_курс_Go.pdf';
             const list = document.getElementById('literature-list');
-            list.innerHTML = ''; 
+            list.innerHTML = '';
 
-            const books = BOOKS_DATA; // Використовуємо вбудовані дані
-
-            if (books.length === 0) {
+            if (BOOKS_DATA.length === 0) {
                 list.innerHTML = '<p>Список літератури порожній.</p>';
                 return;
             }
 
-            books.forEach(book => {
+            BOOKS_DATA.forEach(book => {
                 const li = document.createElement('li');
-                
-                let displayName = book.displayName;
-                
-                // Якщо це курс, використовуємо спеціальну назву, якщо потрібно
-                if (book.fileName === COURSE_FILE_NAME) {
-                    // Я видалив рядок "НЕ РОБОЧЕ ПОСИЛАННЯ", щоб не плутати користувача
-                    displayName = book.displayName; 
-                }
-                
+
                 const fileNameDisplay = book.fileName 
                     ? `<span class="file-name">(${book.fileName})</span>` 
                     : '<span class="file-name" style="color:#e06c75;">(Немає імені файлу)</span>';
 
                 li.innerHTML = `
-                    <a href="reader.html?file=${encodeURIComponent(book.fileName)}" title="Читати ${displayName}">
-                        ${displayName}
+                    <a href="reader.html?file=${encodeURIComponent(book.fileName)}" title="Читати ${book.displayName}">
+                        ${book.displayName}
                         ${fileNameDisplay}
                     </a>
                 `;
