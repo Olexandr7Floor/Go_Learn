@@ -342,58 +342,60 @@
 
     // === ЛОГІКА КОМПІЛЯТОРА ===
     
-    async function runCode() {
-        const codeInput = document.getElementById('go-code-input');
-        const outputElement = document.getElementById('go-output');
-        const code = codeInput.value;
+// static/reader.html (Оновлена функція runCode)
+async function runCode() {
+    const codeInput = document.getElementById('go-code-input');
+    const outputElement = document.getElementById('go-output');
+    const code = codeInput.value;
+    
+    outputElement.textContent = 'Компіляція...';
+    
+    try {
+        // Використовуємо абсолютний шлях до Cloudflare Function:
+        const response = await fetch('/api/run-code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
+            body: `version=2&body=${encodeURIComponent(code)}`
+        });
         
-        outputElement.textContent = 'Компіляція...';
-        
-        try {
-            // Запит йде до Cloudflare Function
-            const response = await fetch('/api/run-code', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                },
-                body: `version=2&body=${encodeURIComponent(code)}`
-            });
-            
-            if (!response.ok) {
-                // Виводимо помилку, якщо функція Cloudflare не відповідає
-                throw new Error(`Помилка мережі (HTTP ${response.status}). Перевірте Cloudflare Function.`);
-            }
-
-            const data = await response.json();
-
-            let output = '';
-            if (data.Errors) {
-                output += `Помилка компіляції:\n${data.Errors}\n`;
-            }
-            if (data.Events) {
-                data.Events.forEach(event => {
-                    if (event.Kind === 'stdout') {
-                        output += event.Message;
-                    }
-                    if (event.Kind === 'stderr') {
-                         output += `[STDERR]: ${event.Message}`;
-                    }
-                });
-            }
-            
-            if (!output) {
-                output = "Код успішно виконано (немає виводу).";
-            }
-            
-            outputElement.textContent = output;
-
-        } catch (error) {
-            console.error('Помилка виконання коду:', error);
-            outputElement.textContent = `Помилка виконання коду: ${error.message}`;
+        if (!response.ok) {
+            // Виводимо більш детальну помилку, якщо функція Cloudflare недоступна
+            const errorText = await response.text();
+            throw new Error(`Помилка Cloudflare Function (HTTP ${response.status}). Перевірте logs: ${errorText.substring(0, 100)}...`);
         }
-    }
 
-    window.runCode = runCode;
+        const data = await response.json();
+
+        let output = '';
+        if (data.Errors) {
+            output += `ПОМИЛКА КОМПІЛЯЦІЇ:\n${data.Errors}\n`;
+        }
+        if (data.Events) {
+            data.Events.forEach(event => {
+                if (event.Kind === 'stdout') {
+                    output += event.Message;
+                }
+                if (event.Kind === 'stderr') {
+                     output += `[STDERR]: ${event.Message}`;
+                }
+            });
+        }
+        
+        if (!output && !data.Errors) {
+             output = "Код успішно виконано (немає виводу).";
+        }
+        
+        outputElement.textContent = output;
+
+    } catch (error) {
+        console.error('Помилка виконання коду:', error);
+        outputElement.textContent = `КРИТИЧНА ПОМИЛКА: Не вдалося з'єднатися з компілятором. ${error.message}`;
+    }
+}
+
+window.runCode = runCode;
 </script>
 </body>
 </html> 
