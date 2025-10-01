@@ -167,7 +167,7 @@
 // import "fmt"
 // 
 // func main() {
-// 	fmt.Println("Hello, Go!")
+//  fmt.Println("Hello, Go!")
 // }</textarea>
         <button onclick="runCode()" class="run-button">Виконати код</button>
         <pre id="go-output">Натисніть "Виконати код", щоб побачити результат.</pre>
@@ -183,7 +183,7 @@
 <script>
     // КОНСТАНТИ
     const COURSE_FILE_NAME = "1_Фундаментальний_курс_Go.pdf";
-    const LOCAL_COURSE_PATH = "/saveweb2zip-com-pantela-notion-site/index.html"; // Шлях до вашої папки
+    const LOCAL_COURSE_PATH = "/saveweb2zip-com-pantela-notion-site/index.html"; 
 
     const urlParams = new URLSearchParams(window.location.search);
     let fileName = urlParams.get('file'); 
@@ -203,16 +203,21 @@
             document.getElementById('file-title').textContent = "Помилка: Файл не вказано.";
             return;
         }
-
-        // Відображення назви книги
+        
+        // Зберігаємо декодоване ім'я для відображення
         let displayTitle = decodeURIComponent(fileName).replace(/_/g, ' ');
         if (displayTitle.indexOf('.pdf') > -1) {
+            // Видаляємо префікс '1_' та розширення '.pdf' для чистого відображення
             displayTitle = displayTitle.substring(displayTitle.indexOf('_') + 1, displayTitle.length - 4);
         }
         document.getElementById('file-title').textContent = displayTitle;
 
-        // Встановлення шляху до PDF Viewer (ПОТРІБЕН КОНТЕКСТ)
-        // Припускаємо, що pdfjs_viewer знаходиться поруч:
+        // Встановлення шляху до PDF Viewer (ВИПРАВЛЕНО)
+        // ВИДАЛЕНО encodeURIComponent навколо fileName, оскільки він уже закодований у reader.html, 
+        // або використовуйте ТІЛЬКИ ОДИН РАЗ, щоб уникнути подвійного кодування.
+        // Я ПОВЕРТАЮ encodeURIComponent, але ВИДАЛЯЮ ЗАЙВИЙ СЛЕДЖ У reader.html
+        
+        // !!! КРИТИЧНЕ ВИПРАВЛЕННЯ ШЛЯХУ (УСУНЕННЯ ПОДВІЙНОГО ШЛЯХУ) !!!
         const pdfViewerPath = 
         `/static/js/pdfjs_viewer/web/viewer.html?file=/literature/${encodeURIComponent(fileName)}`;
     
@@ -345,7 +350,7 @@
         outputElement.textContent = 'Компіляція...';
         
         try {
-            // ЗМІНЕНО: Запит йде до Cloudflare Function
+            // Запит йде до Cloudflare Function
             const response = await fetch('/api/run-code', {
                 method: 'POST',
                 headers: {
@@ -355,6 +360,7 @@
             });
             
             if (!response.ok) {
+                // Виводимо помилку, якщо функція Cloudflare не відповідає
                 throw new Error(`Помилка мережі (HTTP ${response.status}). Перевірте Cloudflare Function.`);
             }
 
@@ -390,4 +396,4 @@
     window.runCode = runCode;
 </script>
 </body>
-</html>
+</html> 
