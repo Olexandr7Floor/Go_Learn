@@ -218,8 +218,7 @@
         // Я ПОВЕРТАЮ encodeURIComponent, але ВИДАЛЯЮ ЗАЙВИЙ СЛЕДЖ У reader.html
         
         // !!! КРИТИЧНЕ ВИПРАВЛЕННЯ ШЛЯХУ (УСУНЕННЯ ПОДВІЙНОГО ШЛЯХУ) !!!
-        const pdfViewerPath = 
-        `/static/js/pdfjs_viewer/web/viewer.html?file=/literature/${encodeURIComponent(fileName)}`;
+        const pdfViewerPath = `/static/js/pdfjs_viewer/web/viewer.html?file=/literature/${encodeURIComponent(fileName)}`;
     
         // Встановлюємо src для iframe
         document.getElementById('pdf-iframe').src = pdfViewerPath;  
