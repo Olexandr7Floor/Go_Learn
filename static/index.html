@@ -1,311 +1,234 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Go (Golang) Література</title>
-    <style>
-        :root {
-            /* Гнучкі розміри шрифту для основного тексту */
-            --font-size-base: 1.1rem;
-            --font-size-clamp: clamp(1rem, 1.2vw, 1.3rem);
-            /* Змінна для розміру гоферів */
-            --gopher-size: clamp(150px, 20vw, 400px);
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background-color: #282c34;
-            color: #f8f8f2;
-            line-height: 1.6;
-            min-height: 100vh;
-            
-            /* Вирівнювання по центру для великих моніторів */
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding-top: 30px;
-            padding-bottom: 30px;
-    
-            /* --- ТІЛЬКИ ЛІВИЙ ГОФЕР (background-image може мати лише один transform) --- */
-            background-image: url('images/go_gopher_left.png');
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-position: left 50px bottom 50px; /* Позиція лише для лівого гофера */
-            background-size: var(--gopher-size);
-            
-            /* Важливо для позиціонування псевдоелемента */
-            position: relative;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Go (Golang) Література</title>
+  <style>
+    :root {
+      --font-size-clamp: clamp(1rem, 1.2vw, 1.3rem);
+      --gopher-size: clamp(150px, 20vw, 400px);
+    }
 
-        /* --- ПРАВИЙ, ВІДДЗЕРКАЛЕНИЙ ГОФЕР ЧЕРЕЗ PSEUDO-ELEMENT --- */
-        body::after {
-            content: '';
-            display: block;
-            position: fixed; /* Фіксуємо його на екрані */
-            
-            /* Розміри та позиція, як для правого гофера */
-            width: var(--gopher-size);
-            height: var(--gopher-size);
-            right: 50px; 
-            bottom: 500px; 
-            
-            background-image: url('images/go_gopher_right.png');
-            background-size: contain; /* Забезпечує коректне відображення */
-            background-repeat: no-repeat;
-            
-            /* *** ВІДДЗЕРКАЛЕННЯ ПО ГОРИЗОНТАЛІ *** */
-            transform: scaleX(-1);
-        }
-        
-        .container {
-            /* Обмеження ширини для 4K+ моніторів */
-            width: 100%;
-            max-width: 1400px;
-            min-width: 300px;
-            margin: 0 20px;
-            padding: clamp(20px, 3vw, 40px);
-            
-            background-color: #3e4451;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            /* Важливо, щоб вміст був над гоферами */
-            z-index: 10;
-        }
-        
-        h1 {
-            color: #61afef;
-            border-bottom: 2px solid #56b6c2;
-            padding-bottom: 15px;
-            margin-bottom: 30px;
-            font-size: clamp(2rem, 4vw, 3.5rem); 
-        }
-        
-        p {
-            font-size: var(--font-size-clamp);
-        }
-    
-        /* Кнопки курсу */
-        .courses {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .course-button {
-            background-color: #e5c07b;
-            color: #282c34;
-            border: none;
-            padding: clamp(10px, 1.5vw, 15px) 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.2s;
-            flex: 1 1 45%;
-            text-align: center;
-            font-size: var(--font-size-clamp);
-        }
-        
-        .course-button:hover {
-            background-color: #cfad6b;
-        }
-        
-        /* Список літератури */
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        
-        li {
-            background-color: #2c313a;
-            margin-bottom: 12px;
-            padding: clamp(12px, 2vw, 20px);
-            border-radius: 5px;
-            transition: background-color 0.3s;
-            font-size: var(--font-size-clamp);
-        }
-        
-        li:hover {
-            background-color: #4b5263;
-        }
-        
-        a {
-            color: #98c379;
-            text-decoration: none;
-            font-weight: bold;
-            display: block;
-        }
-        
-        a:hover {
-            text-decoration: underline;
-            color: #e5c07b;
-        }
-        
-        .file-name {
-            font-size: 0.7em;
-            color: #7f848e;
-            display: block;
-            margin-top: 5px;
-        }
-        
-        /* === МЕДІА-ЗАПИТИ === */
-        
-        /* Мобільні пристрої (до 600px) */
-        @media (max-width: 600px) {
-            body {
-                padding: 10px 0; 
-                align-items: flex-start;
-                /* Прибираємо лівого гофера */
-                background-image: none; 
-            }
-    
-            .container {
-                margin: 0;
-                border-radius: 0;
-                padding: 15px;
-                box-shadow: none;
-            }
-    
-            .courses {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .course-button {
-                flex: 1 1 100%;
-                padding: 12px;
-                font-size: 1rem;
-            }
-    
-            /* Прибираємо правого гофера-псевдоелемент на дуже маленьких екранах */
-            body::after {
-                display: none;
-            }
-        }
-    
-        /* Планшети (601px - 1024px) */
-        @media (min-width: 601px) and (max-width: 1024px) {
-            .container {
-                max-width: 90%;
-                margin: 0 auto;
-            }
-            body {
-                /* Переміщуємо лівого гофера */
-                background-position: left 20px bottom 20px;
-            }
-            body::after {
-                /* Переміщуємо правого гофера */
-                right: 20px;
-                bottom: 200px;
-            }
-        }
-    
-        /* Екстремально великі монітори (4K, 2560px+) */
-        @media (min-width: 2000px) {
-            body {
-                /* Відсуваємо лівого гофера від вмісту */
-                background-position: left 200px bottom 50px;
-                background-size: 500px;
-            }
-            body::after {
-                /* Відсуваємо правого гофера від вмісту */
-                right: 200px;
-                bottom: 600px;
-                width: 500px;
-                height: 500px;
-            }
-            .container {
-                max-width: 1800px;
-            }
-        }
-    </style>
-        
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background-color: #282c34;
+      color: #f8f8f2;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 30px 0;
+      background-image: url('images/go_gopher_left.png');
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: left 50px bottom 50px;
+      background-size: var(--gopher-size);
+      position: relative;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      width: var(--gopher-size);
+      height: var(--gopher-size);
+      right: 50px;
+      bottom: 500px;
+      background: url('images/go_gopher_right.png') no-repeat center/contain;
+      transform: scaleX(-1);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      min-width: 300px;
+      margin: 0 20px;
+      padding: clamp(20px, 3vw, 40px);
+      background-color: #3e4451;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      z-index: 10;
+    }
+
+    h1 {
+      color: #61afef;
+      border-bottom: 2px solid #56b6c2;
+      padding-bottom: 15px;
+      margin-bottom: 30px;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+    }
+
+    p {
+      font-size: var(--font-size-clamp);
+    }
+
+    .courses {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .course-button {
+      background-color: #e5c07b;
+      color: #282c34;
+      border: none;
+      padding: clamp(10px, 1.5vw, 15px) 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.2s;
+      flex: 1 1 45%;
+      text-align: center;
+      font-size: var(--font-size-clamp);
+    }
+
+    .course-button:hover {
+      background-color: #cfad6b;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      background-color: #2c313a;
+      margin-bottom: 12px;
+      padding: clamp(12px, 2vw, 20px);
+      border-radius: 5px;
+      transition: background-color 0.3s;
+      font-size: var(--font-size-clamp);
+    }
+
+    li:hover {
+      background-color: #4b5263;
+    }
+
+    a {
+      color: #98c379;
+      text-decoration: none;
+      font-weight: bold;
+      display: block;
+    }
+
+    a:hover {
+      text-decoration: underline;
+      color: #e5c07b;
+    }
+
+    .file-name {
+      font-size: 0.7em;
+      color: #7f848e;
+      display: block;
+      margin-top: 5px;
+    }
+
+    /* === АДАПТАЦІЯ === */
+    @media (max-width: 600px) {
+      body {
+        padding: 0;
+        align-items: flex-start;
+        background-image: none; /* повністю прибираємо гоферів */
+      }
+      body::after {
+        display: none;
+      }
+      .container {
+        margin: 0;
+        border-radius: 0;
+        padding: 15px;
+        box-shadow: none;
+        max-width: 100%;
+      }
+      .courses {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .course-button {
+        flex: 1 1 100%;
+        padding: 12px;
+        font-size: 1rem;
+      }
+    }
+
+    @media (min-width: 601px) and (max-width: 1024px) {
+      .container {
+        max-width: 90%;
+        margin: 0 auto;
+      }
+      body {
+        background-position: left 20px bottom 20px;
+      }
+      body::after {
+        right: 20px;
+        bottom: 200px;
+      }
+    }
+
+    @media (min-width: 2000px) {
+      body {
+        background-position: left 200px bottom 50px;
+        background-size: 500px;
+      }
+      body::after {
+        right: 200px;
+        bottom: 600px;
+        width: 500px;
+        height: 500px;
+      }
+      .container {
+        max-width: 1800px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Go (Golang) Література</h1>
-
-        <div class="courses">
-            <a 
-                href="https://go.dev/tour/welcome/1" 
-                target="_blank" 
-                class="course-button"
-                title="Відкрити загальний курс Go"
-            >
-                Загальний курс
-            </a>
-            <a 
-                href="https://pantela.notion.site/Go-EvgenyPantela-2622eb3830de43639fbb7a0e2b7c2757" 
-                target="_blank" 
-                class="course-button"
-                title="Відкрити локальний курс Go"
-            >
-                Фундаментальний курс
-            </a>
-        </div>
-
-        <p>Оберіть книгу для читання:</p>
-        <ul id="literature-list">
-            <p>Завантаження списку...</p>
-        </ul>
+  <div class="container">
+    <h1>Go (Golang) Література</h1>
+    <div class="courses">
+      <a href="https://go.dev/tour/welcome/1" target="_blank" class="course-button">Загальний курс</a>
+      <a href="https://pantela.notion.site/Go-EvgenyPantela-2622eb3830de43639fbb7a0e2b7c2757" target="_blank" class="course-button">Фундаментальний курс</a>
     </div>
 
-    <script>
-        const BOOKS_DATA = [
-            {
-                "displayName": "GO idiomy i patterny proektirovaniya",
-                "fileName": "1_GO_idiomy_i_patterny_proektirovaniya.pdf"
-            },
-            {
-                "displayName": "book9Golang для профи работа с сетью, многопоточность, структуры данных",
-                "fileName": "2_book9Golang_для_профи_работа_с_сетью,_многопоточность,_структуры_данных.pdf"
-            },
-            {
-                "displayName": "golang 3nbsped 9785446119998 9781801079310 compress",
-                "fileName": "3_golang-3nbsped-9785446119998-9781801079310_compress.pdf"
-            },
-            {
-                "displayName": "Metyu A. Titmus Oblachnyiy Go. Sozdanie nadezhnyih sluzhb v nenadezhnyih okruzheniyah",
-                "fileName": "4_Metyu_A._Titmus_Oblachnyiy_Go._Sozdanie_nadezhnyih_sluzhb_v_nenadezhnyih_okruzheniyah.pdf"
-            },
-            {
-                "displayName": "black hat go",
-                "fileName": "5_black-hat-go.pdf"
-            },
-            {
-                "displayName": "Packt.Mastering.Go.www.EBooksWorld.ir",
-                "fileName": "6_Packt.Mastering.Go.www.EBooksWorld.ir.pdf"
-            }
-        ];
+    <p>Оберіть книгу для читання:</p>
+    <ul id="literature-list">
+      <li>Завантаження списку...</li>
+    </ul>
+  </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const list = document.getElementById('literature-list');
-            list.innerHTML = '';
+  <script>
+    const BOOKS_DATA = [
+      { "displayName": "GO idiomy i patterny proektirovaniya", "fileName": "1_GO_idiomy_i_patterny_proektirovaniya.pdf" },
+      { "displayName": "book9Golang для профи...", "fileName": "2_book9Golang.pdf" },
+      { "displayName": "golang 3nbsped...", "fileName": "3_golang-3nbsped.pdf" },
+      { "displayName": "Metyu A. Titmus Oblachnyiy Go...", "fileName": "4_Metyu_A._Titmus_Oblachnyiy_Go.pdf" },
+      { "displayName": "black hat go", "fileName": "5_black-hat-go.pdf" },
+      { "displayName": "Packt.Mastering.Go", "fileName": "6_Packt.Mastering.Go.pdf" }
+    ];
 
-            if (BOOKS_DATA.length === 0) {
-                list.innerHTML = '<p>Список літератури порожній.</p>';
-                return;
-            }
-
-            BOOKS_DATA.forEach(book => {
-                const li = document.createElement('li');
-
-                const fileNameDisplay = book.fileName 
-                    ? `<span class="file-name">(${book.fileName})</span>` 
-                    : '<span class="file-name" style="color:#e06c75;">(Немає імені файлу)</span>';
-
-                li.innerHTML = `
-                    <a href="reader.html?file=${encodeURIComponent(book.fileName)}" title="Читати ${book.displayName}">
-                        ${book.displayName}
-                        ${fileNameDisplay}
-                    </a>
-                `;
-                list.appendChild(li);
-            });
-        });
-    </script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const list = document.getElementById('literature-list');
+      list.innerHTML = '';
+      if (BOOKS_DATA.length === 0) {
+        list.innerHTML = '<li>Список літератури порожній.</li>';
+        return;
+      }
+      BOOKS_DATA.forEach(book => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <a href="reader.html?file=${encodeURIComponent(book.fileName)}" title="Читати ${book.displayName}">
+            ${book.displayName}
+            <span class="file-name">(${book.fileName})</span>
+          </a>
+        `;
+        list.appendChild(li);
+      });
+    });
+  </script>
 </body>
 </html>
