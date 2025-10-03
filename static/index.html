@@ -9,6 +9,8 @@
             /* Гнучкі розміри шрифту для основного тексту */
             --font-size-base: 1.1rem;
             --font-size-clamp: clamp(1rem, 1.2vw, 1.3rem);
+            /* Змінна для розміру гоферів */
+            --gopher-size: clamp(150px, 20vw, 400px);
         }
         
         body {
@@ -22,31 +24,54 @@
             /* Вирівнювання по центру для великих моніторів */
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Вирівнювання зверху, щоб контейнер не займав всю висоту */
-            padding-top: 30px; /* Невеликий відступ зверху */
+            align-items: flex-start;
+            padding-top: 30px;
             padding-bottom: 30px;
     
-            /* Фонові Гофери */
-            background-image: 
-                url('images/go_gopher_left.png'), 
-                url('images/go_gopher_right.png');
+            /* --- ТІЛЬКИ ЛІВИЙ ГОФЕР (background-image може мати лише один transform) --- */
+            background-image: url('images/go_gopher_left.png');
             background-repeat: no-repeat;
             background-attachment: fixed;
-            background-position: left 50px bottom 50px, right 50px bottom 500px; 
-            background-size: clamp(150px, 20vw, 400px); /* Адаптивний розмір зображень */
+            background-position: left 50px bottom 50px; /* Позиція лише для лівого гофера */
+            background-size: var(--gopher-size);
+            
+            /* Важливо для позиціонування псевдоелемента */
+            position: relative;
+        }
+
+        /* --- ПРАВИЙ, ВІДДЗЕРКАЛЕНИЙ ГОФЕР ЧЕРЕЗ PSEUDO-ELEMENT --- */
+        body::after {
+            content: '';
+            display: block;
+            position: fixed; /* Фіксуємо його на екрані */
+            
+            /* Розміри та позиція, як для правого гофера */
+            width: var(--gopher-size);
+            height: var(--gopher-size);
+            right: 50px; 
+            bottom: 500px; 
+            
+            background-image: url('images/go_gopher_right.png');
+            background-size: contain; /* Забезпечує коректне відображення */
+            background-repeat: no-repeat;
+            
+            /* *** ВІДДЗЕРКАЛЕННЯ ПО ГОРИЗОНТАЛІ *** */
+            transform: scaleX(-1);
         }
         
         .container {
             /* Обмеження ширини для 4K+ моніторів */
             width: 100%;
-            max-width: 1400px; /* Обмежуємо максимальну ширину */
-            min-width: 300px; /* Мінімальна ширина для мобільних */
-            margin: 0 20px; /* Невеликий бічний відступ на великих екранах */
+            max-width: 1400px;
+            min-width: 300px;
+            margin: 0 20px;
             padding: clamp(20px, 3vw, 40px);
             
             background-color: #3e4451;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            /* Важливо, щоб вміст був над гоферами */
+            z-index: 10;
         }
         
         h1 {
@@ -54,7 +79,6 @@
             border-bottom: 2px solid #56b6c2;
             padding-bottom: 15px;
             margin-bottom: 30px;
-            /* Гнучкий розмір заголовка */
             font-size: clamp(2rem, 4vw, 3.5rem); 
         }
         
@@ -66,7 +90,7 @@
         .courses {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px; /* Збільшуємо простір між кнопками */
+            gap: 15px;
             margin-bottom: 30px;
         }
         
@@ -80,7 +104,7 @@
             text-decoration: none;
             font-weight: bold;
             transition: background-color 0.2s;
-            flex: 1 1 45%; /* Дозволяє двом кнопкам займати майже половину ширини */
+            flex: 1 1 45%;
             text-align: center;
             font-size: var(--font-size-clamp);
         }
@@ -121,7 +145,7 @@
         }
         
         .file-name {
-            font-size: 0.7em; /* Трохи менше, ніж основний шрифт */
+            font-size: 0.7em;
             color: #7f848e;
             display: block;
             margin-top: 5px;
@@ -132,14 +156,15 @@
         /* Мобільні пристрої (до 600px) */
         @media (max-width: 600px) {
             body {
-                /* Прибираємо бічний відступ, щоб зайняти всю ширину */
                 padding: 10px 0; 
                 align-items: flex-start;
+                /* Прибираємо лівого гофера */
+                background-image: none; 
             }
     
             .container {
                 margin: 0;
-                border-radius: 0; /* Вигляд "від краю до краю" */
+                border-radius: 0;
                 padding: 15px;
                 box-shadow: none;
             }
@@ -155,9 +180,9 @@
                 font-size: 1rem;
             }
     
-            /* Прибираємо гоферів на дуже маленьких екранах, щоб не заважали */
-            body {
-                background-image: none;
+            /* Прибираємо правого гофера-псевдоелемент на дуже маленьких екранах */
+            body::after {
+                display: none;
             }
         }
     
@@ -168,17 +193,29 @@
                 margin: 0 auto;
             }
             body {
-                /* Переміщуємо гоферів ближче до центру */
-                background-position: left 20px bottom 20px, right 20px bottom 200px;
+                /* Переміщуємо лівого гофера */
+                background-position: left 20px bottom 20px;
+            }
+            body::after {
+                /* Переміщуємо правого гофера */
+                right: 20px;
+                bottom: 200px;
             }
         }
     
         /* Екстремально великі монітори (4K, 2560px+) */
         @media (min-width: 2000px) {
             body {
-                /* Відсуваємо гоферів від вмісту */
-                background-position: left 200px bottom 50px, right 200px bottom 600px;
+                /* Відсуваємо лівого гофера від вмісту */
+                background-position: left 200px bottom 50px;
                 background-size: 500px;
+            }
+            body::after {
+                /* Відсуваємо правого гофера від вмісту */
+                right: 200px;
+                bottom: 600px;
+                width: 500px;
+                height: 500px;
             }
             .container {
                 max-width: 1800px;
